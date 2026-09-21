@@ -17,7 +17,6 @@ class NewsArticle {
     required this.publishedAt,
   });
 
-  // Convert the NewsArticle object into JSON.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -30,16 +29,15 @@ class NewsArticle {
     };
   }
 
-  // Create a NewsArticle object from JSON.
   factory NewsArticle.fromJson(Map<String, dynamic> json) {
     return NewsArticle(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      imageUrl: json['imageUrl'] as String,
-      articleUrl: json['articleUrl'] as String,
-      source: json['source'] as String,
-      publishedAt: DateTime.parse(json['publishedAt'] as String),
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      imageUrl: json['imageUrl'],
+      articleUrl: json['articleUrl'],
+      source: json['source'],
+      publishedAt: DateTime.parse(json['publishedAt']),
     );
   }
 }
