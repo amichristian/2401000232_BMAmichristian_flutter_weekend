@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/news_article.dart';
+import 'webview_screen.dart';
 
 class ArticleDetailScreen extends StatelessWidget {
   final NewsArticle article;
@@ -64,6 +65,23 @@ class ArticleDetailScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WebViewScreen(article: article),
+                      ),
+                    );
+                  },
+                  child: const Text('Read Full Article'),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },

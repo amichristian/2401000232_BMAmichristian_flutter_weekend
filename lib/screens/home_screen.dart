@@ -15,6 +15,141 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool isExpanded = false;
 
+  final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final imageUrlController = TextEditingController();
+  final articleUrlController = TextEditingController();
+  final sourceController = TextEditingController();
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    imageUrlController.dispose();
+    articleUrlController.dispose();
+    sourceController.dispose();
+    super.dispose();
+  }
+
+  void showAddArticleForm() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add News Article'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+
+                const SizedBox(height: 12),
+
+                TextField(
+                  controller: imageUrlController,
+                  decoration: const InputDecoration(
+                    labelText: 'Image URL',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                TextField(
+                  controller: articleUrlController,
+                  decoration: const InputDecoration(
+                    labelText: 'Article URL',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                TextField(
+                  controller: sourceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Source',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+
+            ElevatedButton(
+              onPressed: () {
+                addArticle();
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void addArticle() {
+    if (titleController.text.trim().isEmpty ||
+        descriptionController.text.trim().isEmpty ||
+        imageUrlController.text.trim().isEmpty ||
+        articleUrlController.text.trim().isEmpty ||
+        sourceController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields.')),
+      );
+
+      return;
+    }
+
+    final article = NewsArticle(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: titleController.text.trim(),
+      description: descriptionController.text.trim(),
+      imageUrl: imageUrlController.text.trim(),
+      articleUrl: articleUrlController.text.trim(),
+      source: sourceController.text.trim(),
+      publishedAt: DateTime.now(),
+    );
+
+    ref.read(newsProvider.notifier).addArticle(article);
+
+    titleController.clear();
+    descriptionController.clear();
+    imageUrlController.clear();
+    articleUrlController.clear();
+    sourceController.clear();
+
+    Navigator.pop(context);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Article added successfully.')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final articles = ref.watch(newsProvider);
@@ -23,7 +158,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: const Text('Simple News Reader'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: showAddArticleForm,
+            icon: const Icon(Icons.add),
+            tooltip: 'Add Article',
+          ),
+        ],
       ),
+
       body: articles.isEmpty
           ? const Center(
               child: Text(
