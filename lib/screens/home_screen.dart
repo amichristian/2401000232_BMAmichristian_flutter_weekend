@@ -150,6 +150,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  void deleteArticle(NewsArticle article) {
+    ref.read(newsProvider.notifier).removeArticle(article.id);
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('${article.title} deleted.')));
+  }
+
+  void showClearAllDialog() {
+    final articles = ref.read(newsProvider);
+
+    if (articles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('There are no articles to clear.')),
+      );
+
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Clear All Articles'),
+          content: const Text(
+            'Are you sure you want to remove all news articles?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+
+            ElevatedButton(
+              onPressed: () {
+                ref.read(newsProvider.notifier).clearArticles();
+
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('All articles have been cleared.'),
+                  ),
+                );
+              },
+              child: const Text('Clear All'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final articles = ref.watch(newsProvider);
@@ -163,6 +217,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: showAddArticleForm,
             icon: const Icon(Icons.add),
             tooltip: 'Add Article',
+          ),
+
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'clear') {
+                showClearAllDialog();
+              }
+            },
+            itemBuilder: (context) {
+              return const [
+                PopupMenuItem<String>(
+                  value: 'clear',
+                  child: Text('Clear All Articles'),
+                ),
+              ];
+            },
           ),
         ],
       ),
@@ -188,81 +258,106 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   child: Card(
                     clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          isExpanded = !isExpanded;
-                        });
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              isExpanded = !isExpanded;
+                            });
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ArticleDetailScreen(article: article),
-                          ),
-                        );
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Hero(
-                            tag: article.id,
-                            child: Image.network(
-                              article.imageUrl,
-                              height: 200,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ArticleDetailScreen(article: article),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Hero(
+                                tag: article.id,
+                                child: Image.network(
+                                  article.imageUrl,
                                   height: 200,
                                   width: double.infinity,
-                                  alignment: Alignment.center,
-                                  child: const Text(
-                                    'Image could not be loaded',
-                                  ),
-                                );
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      height: 200,
+                                      width: double.infinity,
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        'Image could not be loaded',
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      article.title,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 8),
+
+                                    Text(
+                                      article.source,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 8),
+
+                                    AnimatedOpacity(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      opacity: isExpanded ? 1.0 : 0.7,
+                                      child: Text(
+                                        article.description,
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 12,
+                            right: 12,
+                            bottom: 12,
+                          ),
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: () {
+                                deleteArticle(article);
                               },
+                              icon: const Icon(Icons.delete_outline),
+                              label: const Text('Delete'),
                             ),
                           ),
-
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  article.title,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-
-                                const SizedBox(height: 8),
-
-                                Text(
-                                  article.source,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-
-                                const SizedBox(height: 8),
-
-                                AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 300),
-                                  opacity: isExpanded ? 1.0 : 0.7,
-                                  child: Text(
-                                    article.description,
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 );
