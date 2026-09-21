@@ -1,17 +1,63 @@
-# simple_news_reader
+# Simple News Reader
 
-A new Flutter project.
+## Student Information
 
-## Getting Started
+**Student Name:** B Munezero Ami Christian
 
-This project is a starting point for a Flutter application.
+**Reg number:**
 
-A few resources to get you started if this is your first Flutter project:
+**Project:** Simple News Reader
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+**Course:** Mobile Application Development with Flutter
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## Project Description
+
+Simple News Reader is a Flutter application that allows users to browse news articles, view article details, and open the full article inside a WebView.
+
+Users can also add new news articles through a form.
+
+---
+
+## Main Features
+
+- Browse news articles
+- View article details
+- Open full articles using WebView
+- Add new news articles
+- Form validation
+- SnackBar error and success messages
+- Empty state when there are no articles
+- Hero animation
+- AnimatedContainer
+- AnimatedOpacity
+- Riverpod state management
+
+
+---
+
+## Technologies Used
+
+- Flutter
+- Dart
+- Riverpod
+- WebView
+- Material Design
+
+---
+
+## Project Structure
+
+```text
+lib/
+├── main.dart
+├── models/
+│   └── news_article.dart
+├── providers/
+│   └── news_provider.dart
+├── screens/
+│   ├── home_screen.dart
+│   ├── article_detail_screen.dart
+│   └── webview_screen.dart
+└── widgets/
